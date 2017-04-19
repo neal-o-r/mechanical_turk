@@ -13,43 +13,55 @@ def random_player(board):
 		if i == r:
 			return m	
 
+def human_player(board):
+
+	display(board)
+	uci = input('Your Move  ')
+	return chess.Move.from_uci(uci)
+
+
 def display(board):
 	
 	print(board)
 	print('\n')		
 
 
-def play_a_game(player1, player2):
+def play_a_game(players):
 
 	board = chess.Board()
-	
-	player = player1
+	i = 0
 	while not board.is_game_over():
-	
+				
+		player = players[i % 2]	
 		move = player(board)
 		board.push(move)
-		player = player2		
-
-		continue
-	
+		i += 1
+		
 	if board.is_stalemate():
 		return 0
 	else:
 		return 1 + int(board.turn)
 
-
-def tournament(entrants, rounds):
-	
-	player1, player2 = entrants[0], entrants[1]
-
-	winners = []
-	for i in range(rounds):
-		
-		winners.append(play_a_game(player1, player2))
+def plot_wins(winners):
 
 	win1 = winners.count(1)
 	win2 = winners.count(2)	
 	draw = winners.count(0)
 
-	plt.bar([0, 1, 2], [win1, win2, draw])
+	fig = plt.figure()
+	ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
+
+	ax.bar([0, 1, 2], [win1, win2, draw], align='center')
+	ax.set_xticks([0, 1, 2])
+	ax.set_xticklabels(('Player1', 'Player2', 'Draw'))
 	plt.show()
+
+
+def tournament(entrants, rounds):
+	
+	winners = []
+	for i in range(rounds):
+		
+		winners.append(play_a_game(entrants))
+
+	plot_wins(winners)
