@@ -7,9 +7,14 @@ import players
 
 def display(board):
 	
-	print(board)
+	s = str(board)
+	s = [str(8-i) + '. '+v for i, v in enumerate(s.split('\n'))]
+	s = '\n'.join(s)
+
+	print(s)
+	print('   A B C D E F G H')
 	print('\n')		
-	time.sleep(1)
+#	time.sleep(1)
 
 
 def play_a_game(players, show=False):

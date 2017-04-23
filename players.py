@@ -4,6 +4,7 @@ import chess
 import numpy as np
 import evaluation
 from timeout import timeout
+import mechanical_turk
 
 def random_player(board):
 	# makes a random move each time.	
@@ -14,7 +15,7 @@ def random_player(board):
 
 def human_player(board):
 	# if you want to play the turk
-	display(board)
+	mechanical_turk.display(board)
 	uci = input('Your Move	')
 	return chess.Move.from_uci(uci)
 
@@ -43,16 +44,14 @@ def eval_player(board):
 def mm_player(board):
 	# minimax player
 
-	best_score = 99999
+	best_score = -99999
 	move = None
 	n_moves = len(board.legal_moves)
-	i = 0
 	for m in board.generate_legal_moves():
 		new_board = board.copy()
 		new_board.push(m)
 		score = mm_iterative_deepen(new_board, n_moves)
-		#score = minimax(new_board, 1, True)
-		if score < best_score:
+		if score > best_score:
 			best_score = score
 			move = m
 
@@ -70,7 +69,6 @@ def ab_player(board):
 		new_board = board.copy()
 		new_board.push(m)
 		score = ab_iterative_deepen(new_board, n_moves)
-		#score = minimax(new_board, 1, True)
 		if score < best_score:
 			best_score = score
 			move = m
@@ -83,15 +81,15 @@ def ab_iterative_deepen(board, n):
 	score = alpha_beta(board, 1, -99999, 99999, True)
 
 	d = 5
-	with timeout(seconds=1/n):
+	with timeout(seconds=2/n):
 		for i in range(2, d):
 			try:
 				s = alpha_beta(board, i, -99999, 99999, True)
 			except:
 				break
-			print(i)
 			score = s
 	return score
+
 
 def mm_iterative_deepen(board, n):
 
@@ -165,9 +163,3 @@ def alpha_beta(board_in, depth, alpha, beta, turn):
 				break
 
 		return v
-
-
-
-
-
-
