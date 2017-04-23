@@ -24,14 +24,14 @@ def play_a_game(players, show=False):
 		i += 1
 		if show: display(board)
 	
-	return board.result()
+	return 0 if board.result() == '*' else eval(board.result())
 
 
 def plot_wins(winners):
 
-	win1 = winners.count('1-0')
-	win2 = winners.count('0-1')	
-	draw = winners.count('1/2-1/2')
+	win1 = winners.count(1)
+	win2 = winners.count(-1)	
+	draw = winners.count(0)
 
 	fig = plt.figure()
 	ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
@@ -46,9 +46,9 @@ def tournament(entrants, rounds):
 	
 	winners = []
 	for i in range(rounds):
-		
+		print("Game No. {}".format(i))	
 		winners.append(play_a_game(entrants))
-
+	
 	plot_wins(winners)
 
-play_a_game([players.random_player, players.mm_player], show=True)
+#play_a_game([players.random_player, players.mm_player], show=True)
