@@ -1,5 +1,4 @@
 # Mechanical Turk
----
 
 A chess playing bot. Currently can play in a few ways, in increasing order of ability:
  
