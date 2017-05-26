@@ -3,7 +3,7 @@
 A chess playing bot. Currently can play in a few ways, in increasing order of ability:
  
 	* Randomly 
-	* Evaluate one move ahead
+	* Evaluate 1 move ahead
 	* Evaluate n moves ahead with iteratively deepened minimax.
 	* Evaluate n moves ahead with iteratively deepened alpha-beta pruned minimax.
 
