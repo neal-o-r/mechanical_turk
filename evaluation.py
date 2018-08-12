@@ -50,16 +50,15 @@ queen = np.array([-20,-10,-10, -5, -5,-10,-10,-20,
 move_table = [pawn, bishop, queen, knight, rook]
 
 def end_result(board):
-
         return 0 if board.result() == '*' else eval(board.result())
 
 
 def piece_evaluate(board):
-
-        # evaluate board by summing all opponents pieces
-        # and checking for mate
-
-        # returns a postive value for white adv, neg for black
+        '''
+        evaluate board by summing all opponents pieces
+        and checking for mate
+        returns a postive value for white adv, neg for black
+        '''
 
         if board.is_game_over(claim_draw=True):
                 return end_result(board) * 10000
@@ -71,7 +70,7 @@ def piece_evaluate(board):
                                 (chess.KNIGHT, 320),
                                 (chess.ROOK, 500)]):
 
-                piece, value = t[0], t[1]
+                piece, value = t
                 white = board.pieces(piece, True)
                 black = board.pieces(piece, False)
 
@@ -79,5 +78,3 @@ def piece_evaluate(board):
                 score -= len(black)  * value + np.sum(move_table[i][list(black)])
 
         return score
-
-
