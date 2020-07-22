@@ -1,6 +1,9 @@
 import signal
 
-class timeout:
+class timeout():
+    """
+    class to handle timeout - play for a while, then kill the process
+    """
     def __init__(self, seconds=1, error_message='Timeout'):
         self.seconds = seconds
         self.error_message = error_message

@@ -1,80 +1,50 @@
 import chess
 import random
 import numpy as np
+from movetable import move_table
 
-pawn = np.array([0,  0,  0,  0,  0,  0,  0,  0,
-                50, 50, 50, 50, 50, 50, 50, 50,
-                10, 10, 20, 30, 30, 20, 10, 10,
-                5,  5, 10, 25, 25, 10,  5,  5,
-                0,  0,  0, 20, 20,  0,  0,  0,
-                5, -5,-10,  0,  0,-10, -5,  5,
-                5, 10, 10,-20,-20, 10, 10,  5,
-                0,  0,  0,  0,  0,  0,  0,  0])
+piece_values = {
+    chess.PAWN: 100,
+    chess.BISHOP: 330,
+    chess.QUEEN: 900,
+    chess.KNIGHT: 320,
+    chess.ROOK: 500,
+}
 
-knight = np.array([-50,-40,-30,-30,-30,-30,-40,-50,
--40,-20,  0,  0,  0,  0,-20,-40,
--30,  0, 10, 15, 15, 10,  0,-30,
--30,  5, 15, 20, 20, 15,  5,-30,
--30,  0, 15, 20, 20, 15,  0,-30,
--30,  5, 10, 15, 15, 10,  5,-30,
--40,-20,  0,  5,  5,  0,-20,-40,
--50,-40,-30,-30,-30,-30,-40,-50])
-
-bishop = np.array([-20,-10,-10,-10,-10,-10,-10,-20,
--10,  0,  0,  0,  0,  0,  0,-10,
--10,  0,  5, 10, 10,  5,  0,-10,
--10,  5,  5, 10, 10,  5,  5,-10,
--10,  0, 10, 10, 10, 10,  0,-10,
--10, 10, 10, 10, 10, 10, 10,-10,
--10,  5,  0,  0,  0,  0,  5,-10,
--20,-10,-10,-10,-10,-10,-10,-20])
-
-rook = np.array([0,  0,  0,  0,  0,  0,  0,  0,
-  5, 10, 10, 10, 10, 10, 10,  5,
- -5,  0,  0,  0,  0,  0,  0, -5,
- -5,  0,  0,  0,  0,  0,  0, -5,
- -5,  0,  0,  0,  0,  0,  0, -5,
- -5,  0,  0,  0,  0,  0,  0, -5,
- -5,  0,  0,  0,  0,  0,  0, -5,
-  0,  0,  0,  5,  5,  0,  0,  0])
-
-queen = np.array([-20,-10,-10, -5, -5,-10,-10,-20,
--10,  0,  0,  0,  0,  0,  0,-10,
--10,  0,  5,  5,  5,  5,  0,-10,
- -5,  0,  5,  5,  5,  5,  0, -5,
-  0,  0,  5,  5,  5,  5,  0, -5,
--10,  5,  5,  5,  5,  5,  0,-10,
--10,  0,  5,  0,  0,  0,  0,-10,
--20,-10,-10, -5, -5,-10,-10,-20])
-
-move_table = [pawn, bishop, queen, knight, rook]
 
 def end_result(board):
-        return 0 if board.result() == '*' else eval(board.result())
+    """
+    check for draw, if not return 1 for white -1 for black
+    """
+    return 0 if board.result() == "*" else eval(board.result())
 
 
-def piece_evaluate(board):
-        '''
+def score_piece(piece, board, white=True):
+    """
+    compute score for a given piece type
+    """
+    pieces = list(board.pieces(piece, white))  # pieces of this kind
+
+    # reverse the board for white
+    score_chart = move_table[piece][::-1] if white else move_table[piece]
+
+    return len(pieces) * piece_values[piece] + np.sum(score_chart[pieces])
+
+
+def score(board):
+    """
         evaluate board by summing all opponents pieces
         and checking for mate
         returns a postive value for white adv, neg for black
-        '''
+        """
+    # if the game is over, return a large score
+    if board.is_game_over(claim_draw=True):
+        return end_result(board) * 10000
 
-        if board.is_game_over(claim_draw=True):
-                return end_result(board) * 10000
+    score = (
+        random.random()  # to break ties
+        + sum(score_piece(p, board) for p in piece_values)
+        - sum(score_piece(p, board, False) for p in piece_values)
+    )
 
-        score = random.random() #to break ties
-        for i, t in enumerate([(chess.PAWN, 100),
-                                (chess.BISHOP, 330),
-                                (chess.QUEEN, 900),
-                                (chess.KNIGHT, 320),
-                                (chess.ROOK, 500)]):
-
-                piece, value = t
-                white = board.pieces(piece, True)
-                black = board.pieces(piece, False)
-
-                score += len(white)  * value + np.sum(move_table[i][::-1][list(white)])
-                score -= len(black)  * value + np.sum(move_table[i][list(black)])
-
-        return score
+    return score
