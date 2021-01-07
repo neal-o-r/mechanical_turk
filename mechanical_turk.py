@@ -1,30 +1,33 @@
 import chess
 import time
 import matplotlib.pyplot as plt
-import random
-from itertools import cycle
 import players
+import evaluation
+from itertools import cycle
+from typing import List, Callable
+
+Players = List[Callable]
 
 
-def play_a_game(players, show=False):
+def play_a_game(players: Players, show: bool = False) -> int:
 
     board = chess.Board()
-    # make a cycle of players and colours (white, black)
-    player_cycle = cycle(zip(players, [True, False]))
+    player_cycle = cycle(players)
 
     while not board.is_game_over(claim_draw=True):
 
-        player, color = next(player_cycle)
-        move = player(board, color)
+        player = next(player_cycle)
+        move = player(board)
         board.push(move)
+
         if show:
-            print(board)
+            print(board, "\n")
             time.sleep(0.5)
 
-    return 0 if board.result() == "*" else eval(board.result())
+    return evaluation.end_result(board)
 
 
-def tournament(entrants, rounds):
+def tournament(entrants: Players, rounds: int):
 
     winners = []
     for i in range(rounds):
@@ -34,7 +37,7 @@ def tournament(entrants, rounds):
     plot_wins(winners)
 
 
-def plot_wins(winners):
+def plot_wins(winners: List[int]):
 
     win1 = winners.count(1)
     win2 = winners.count(-1)
@@ -50,4 +53,5 @@ def plot_wins(winners):
 
 
 if __name__ == "__main__":
-    tournament([players.eval_player, players.minimax_player], 10)
+    play_a_game([players.minimax_player, players.alpha_beta_player], show=True)
+    #tournament([players.eval_player, players.minimax_player], 10)
